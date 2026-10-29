@@ -8,10 +8,19 @@ def emotion_detector(text_to_analyze):
     
     response = requests.post(url, json=input_json, headers=headers)
     
-    # Chuyển đổi phản hồi văn bản thành dictionary
+    # Xử lý lỗi khi status_code là 400 (ví dụ: nhập chuỗi trống)
+    if response.status_code == 400:
+        return {
+            'anger': None,
+            'disgust': None,
+            'fear': None,
+            'joy': None,
+            'sadness': None,
+            'dominant_emotion': None
+        }
+        
     formatted_response = json.loads(response.text)
     
-    # Trích xuất tập hợp các cảm xúc và điểm số từ cấu trúc JSON trả về
     emotions = formatted_response['emotionPredictions'][0]['emotion']
     anger_score = emotions['anger']
     disgust_score = emotions['disgust']
@@ -19,10 +28,8 @@ def emotion_detector(text_to_analyze):
     joy_score = emotions['joy']
     sadness_score = emotions['sadness']
     
-    # Tìm cảm xúc có điểm số cao nhất (dominant emotion)
     dominant_emotion = max(emotions, key=emotions.get)
     
-    # Trả về kết quả theo đúng định dạng yêu cầu
     return {
         'anger': anger_score,
         'disgust': disgust_score,
